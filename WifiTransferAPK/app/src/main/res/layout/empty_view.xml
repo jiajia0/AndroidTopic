@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:gravity="center">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/kulian"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:gravity="center"
+        android:lineSpacingExtra="4dp"
+        android:paddingBottom="50dp"
+        android:paddingTop="10dp"
+        android:text="暂无APK，开启Wifi进行上传"
+        android:textColor="#B19873"
+        android:textSize="14sp"
+        android:textStyle="bold"/>
+
+</LinearLayout>
