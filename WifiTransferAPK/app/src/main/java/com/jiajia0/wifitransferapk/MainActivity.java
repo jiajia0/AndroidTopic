@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
         initView();
         initRecyclerView();
         Timber.plant(new Timber.DebugTree());
+        WifiUtils.getWifiIp(this);
     }
 
     @Override
