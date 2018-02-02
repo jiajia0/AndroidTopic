@@ -17,6 +17,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity {
     Unbinder mUnbinder;//解除视图绑定
@@ -41,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
         mUnbinder = ButterKnife.bind(this);
         initView();
         initRecyclerView();
+        Timber.plant(new Timber.DebugTree());
     }
 
     @Override
