@@ -16,8 +16,14 @@ public class WifiUtils {
         WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();
         if (wifiInfo != null) {
-            Timber.d("WifiAddress:" + wifiInfo.getIpAddress());
+            Timber.d("WifiAddress:" + intToIp(wifiInfo.getIpAddress()));
         }
         return null;
     }
+
+    // 将整型转换为IP形式
+    private static String intToIp(int i) {
+        return (i & 0xFF) + "." + ((i >> 8) & 0xFF) + "." + ((i >> 16) & 0xFF) + "." + ((i >> 24) & 0xFF);
+    }
+
 }
