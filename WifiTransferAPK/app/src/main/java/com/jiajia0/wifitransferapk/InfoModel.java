@@ -15,6 +15,7 @@ public class InfoModel {
     private boolean installed;
     private Drawable icon;
 
+
     public String getPath() {
         return path;
     }
