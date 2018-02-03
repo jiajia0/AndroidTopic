@@ -46,5 +46,4 @@ public class WifiUtils {
         // 返回断开链接的状态
         return NetworkInfo.State.DISCONNECTED;
     }
-
 }
