@@ -1,5 +1,6 @@
 package com.jiajia0.wifitransferapk;
 
+import android.animation.ObjectAnimator;
 import android.content.DialogInterface;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -11,6 +12,8 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.animation.AccelerateInterpolator;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -35,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     SwipeRefreshLayout mSwipeRefreshLayout;//刷新
 
     List<InfoModel> mApps = new ArrayList<>();// 用来保存App的信息
+    WifiAnimatorListener mWifiAnimatorListener = new WifiAnimatorListener();// Wifi监听动画
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initView() {
+        // 设置Toolbar
         mToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -66,6 +71,20 @@ public class MainActivity extends AppCompatActivity {
                         break;
                 }
                 return false;
+            }
+        });
+
+
+        // 开启Wifi
+        mFloatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(mFloatingActionButton,"translationY",0,mFloatingActionButton.getHeight() * 2);
+                objectAnimator.setDuration(200L);
+                // 设置动画速度越来越快
+                objectAnimator.setInterpolator(new AccelerateInterpolator());
+                objectAnimator.addListener(mWifiAnimatorListener);
+                objectAnimator.start();
             }
         });
 
