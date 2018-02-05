@@ -1,6 +1,7 @@
 package com.jiajia0.wifitransferapk;
 
 import android.animation.Animator;
+import android.content.Context;
 
 /**
  * Created by Leafage on 2018/2/4 13:09.
@@ -8,9 +9,17 @@ import android.animation.Animator;
  */
 
 public class WifiAnimatorListener implements Animator.AnimatorListener {
+
+    private Context mContext;
+
+    public WifiAnimatorListener(Context context) {
+        mContext = context;
+    }
+
     @Override
     public void onAnimationStart(Animator animator) {
-
+        new PopupMenuDialog(mContext).builder().setCancelable(false)
+                .setCanceledOnTouchOutside(false).show();
     }
 
     @Override
