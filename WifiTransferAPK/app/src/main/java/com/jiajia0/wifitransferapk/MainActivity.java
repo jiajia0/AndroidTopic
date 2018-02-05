@@ -16,6 +16,10 @@ import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.widget.Toast;
 
+import com.hwangjr.rxbus.RxBus;
+import com.hwangjr.rxbus.annotation.Subscribe;
+import com.hwangjr.rxbus.annotation.Tag;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
     SwipeRefreshLayout mSwipeRefreshLayout;//刷新
 
     List<InfoModel> mApps = new ArrayList<>();// 用来保存App的信息
-    WifiAnimatorListener mWifiAnimatorListener = new WifiAnimatorListener();// Wifi监听动画
+    WifiAnimatorListener mWifiAnimatorListener = new WifiAnimatorListener(this);// Wifi监听动画
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(mToolbar);
         initView();
         initRecyclerView();
+        RxBus.get().register(this);
     }
 
     @Override
@@ -118,4 +123,22 @@ public class MainActivity extends AppCompatActivity {
         builder.show();
     }
 
+    // 对话框取消之后将Wifi标志升起
+    @Subscribe( tags = {@Tag( Constants.RxBusEventType.POPUP_MENU_DIALOG_SHOW_DISMISS )} )
+    public void onPopupMenuDialogDismiss(Integer type) {
+        if ( type == Constants.RxBusEventType.MSG_DIALOG_DISMISS ) {
+            ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(mFloatingActionButton, "translationY", mFloatingActionButton.getHeight() * 2, 0).setDuration(200L);
+            objectAnimator.setInterpolator(new AccelerateInterpolator());
+            objectAnimator.start();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mUnbinder != null) {
+            mUnbinder.unbind();
+        }
+        RxBus.get().unregister(this);
+    }
 }
