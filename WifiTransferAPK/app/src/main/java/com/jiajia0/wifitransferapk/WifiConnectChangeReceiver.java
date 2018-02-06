@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 
+import com.hwangjr.rxbus.RxBus;
+
 import timber.log.Timber;
 
 /**
@@ -22,6 +24,7 @@ public class WifiConnectChangeReceiver extends BroadcastReceiver {
             NetworkInfo networkInfo = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
             if (networkInfo != null) {
                 Timber.d("leafage" + networkInfo.getState());
+                RxBus.get().post(Constants.RxBusEventType.WIFI_CONNECT_CHANGE_EVENT, networkInfo.getState());
             }
         }
     }

@@ -19,7 +19,9 @@ import android.widget.Toast;
 import com.hwangjr.rxbus.RxBus;
 import com.hwangjr.rxbus.annotation.Subscribe;
 import com.hwangjr.rxbus.annotation.Tag;
+import com.hwangjr.rxbus.thread.EventThread;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
 
     List<InfoModel> mApps = new ArrayList<>();// 用来保存App的信息
     WifiAnimatorListener mWifiAnimatorListener = new WifiAnimatorListener(this);// Wifi监听动画
+    APKManager mAPKManager = new APKManager(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,6 +104,51 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setAdapter(mAppShelfAdapter);
+
+        RxBus.get().post(Constants.RxBusEventType.LOAD_APK_LIST, 0);
+        mSwipeRefreshLayout.setColorSchemeResources(
+                android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light
+        );
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                RxBus.get().post(Constants.RxBusEventType.LOAD_APK_LIST, 0);
+            }
+        });
+
+    }
+
+
+    /**
+     * @param type APK列表刷新
+     */
+    @Subscribe(thread = EventThread.IO, tags = {@Tag(Constants.RxBusEventType.LOAD_APK_LIST)})
+    public void refreshAPKList(Integer type) {
+        final List<InfoModel> listArr = new ArrayList<>();
+        File dir = Constants.DIR;
+        // 获取所有的APK文件
+        if (dir.exists() && dir.isDirectory()) {
+            File[] fileNames = dir.listFiles();
+            if (fileNames != null) {
+                for (File fileName : fileNames) {
+                    listArr.add(mAPKManager.getAPKInfo(fileName));
+                }
+            }
+        }
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mSwipeRefreshLayout.setRefreshing(false);
+                mApps.clear();
+                mApps.addAll(listArr);
+                mAppShelfAdapter.notifyDataSetChanged();
+            }
+        });
+
     }
 
     // 显示是否删除APK
