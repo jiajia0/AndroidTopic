@@ -1,7 +1,10 @@
 package com.jiajia0.wifitransferapk;
 
 import android.animation.ObjectAnimator;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
@@ -45,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
 
     List<InfoModel> mApps = new ArrayList<>();// 用来保存App的信息
     WifiAnimatorListener mWifiAnimatorListener = new WifiAnimatorListener(this);// Wifi监听动画
-    APKManager mAPKManager = new APKManager(this);
+    APKManager mAPKManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,9 +56,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mUnbinder = ButterKnife.bind(this); // 必须在setSupportActionBar之前
         setSupportActionBar(mToolbar);
+        init();
         initView();
         initRecyclerView();
-        RxBus.get().register(this);
     }
 
     @Override
@@ -64,6 +67,18 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * 初始化
+     */
+    private void init() {
+        RxBus.get().register(this);
+        Timber.plant(new Timber.DebugTree());
+        mAPKManager = new APKManager(this);
+    }
+
+    /**
+     * 初始化视图
+     */
     private void initView() {
         // 设置Toolbar
         mToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
@@ -96,16 +111,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Timber.plant(new Timber.DebugTree());
-    }
-
-    private void initRecyclerView() {
-        mAppShelfAdapter = new AppShelfAdapter(mApps);
-        mRecyclerView.setHasFixedSize(true);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerView.setAdapter(mAppShelfAdapter);
-
-        RxBus.get().post(Constants.RxBusEventType.LOAD_APK_LIST, 0);
         mSwipeRefreshLayout.setColorSchemeResources(
                 android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light,
@@ -118,7 +123,14 @@ public class MainActivity extends AppCompatActivity {
                 RxBus.get().post(Constants.RxBusEventType.LOAD_APK_LIST, 0);
             }
         });
+    }
 
+    private void initRecyclerView() {
+        mAppShelfAdapter = new AppShelfAdapter(mApps);
+        mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.setAdapter(mAppShelfAdapter);
+        RxBus.get().post(Constants.RxBusEventType.LOAD_APK_LIST, 0);
     }
 
 
@@ -160,6 +172,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 Timber.d("leafage" + "删除全部！");
+                mAPKManager.deleteAll();
             }
         });
         builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -189,4 +202,5 @@ public class MainActivity extends AppCompatActivity {
         }
         RxBus.get().unregister(this);
     }
+
 }
