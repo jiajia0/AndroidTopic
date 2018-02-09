@@ -18,6 +18,7 @@ public class WifiAnimatorListener implements Animator.AnimatorListener {
 
     @Override
     public void onAnimationStart(Animator animator) {
+        WebService.start(mContext);
         new PopupMenuDialog(mContext).builder().setCancelable(false)
                 .setCanceledOnTouchOutside(false).show();
     }
