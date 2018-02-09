@@ -126,10 +126,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initRecyclerView() {
-        mAppShelfAdapter = new AppShelfAdapter(mApps);
+        mAppShelfAdapter = new AppShelfAdapter(mApps, mAPKManager);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setAdapter(mAppShelfAdapter);
+        mRecyclerView.addItemDecoration(new ItemButtomDecoration(this,10));
         RxBus.get().post(Constants.RxBusEventType.LOAD_APK_LIST, 0);
     }
 
@@ -141,11 +142,19 @@ public class MainActivity extends AppCompatActivity {
     public void refreshAPKList(Integer type) {
         final List<InfoModel> listArr = new ArrayList<>();
         File dir = Constants.DIR;
+        Timber.d("leafage" + "-refreshAPKList-" + Constants.DIR);
+
+        if (!dir.exists()) {
+            Timber.d("leafage-" + "目录不存在！");
+        }
+
         // 获取所有的APK文件
         if (dir.exists() && dir.isDirectory()) {
             File[] fileNames = dir.listFiles();
+            Timber.d("leafage" + fileNames);
             if (fileNames != null) {
                 for (File fileName : fileNames) {
+                    Timber.d("leafage" + fileName.getName());
                     listArr.add(mAPKManager.getAPKInfo(fileName));
                 }
             }
@@ -157,6 +166,7 @@ public class MainActivity extends AppCompatActivity {
                 mSwipeRefreshLayout.setRefreshing(false);
                 mApps.clear();
                 mApps.addAll(listArr);
+                Timber.d("leafage-" + listArr.size());
                 mAppShelfAdapter.notifyDataSetChanged();
             }
         });
@@ -188,6 +198,7 @@ public class MainActivity extends AppCompatActivity {
     @Subscribe( tags = {@Tag( Constants.RxBusEventType.POPUP_MENU_DIALOG_SHOW_DISMISS )} )
     public void onPopupMenuDialogDismiss(Integer type) {
         if ( type == Constants.RxBusEventType.MSG_DIALOG_DISMISS ) {
+            WebService.stop(this);
             ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(mFloatingActionButton, "translationY", mFloatingActionButton.getHeight() * 2, 0).setDuration(200L);
             objectAnimator.setInterpolator(new AccelerateInterpolator());
             objectAnimator.start();
@@ -197,6 +208,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        WebService.stop(this);
         if (mUnbinder != null) {
             mUnbinder.unbind();
         }
